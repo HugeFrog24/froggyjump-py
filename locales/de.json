@@ -1,0 +1,12 @@
+{
+    "title": "Frosch-Hüpf-Spiel",
+    "instructions": [
+    "Anleitung:",
+    "- Benutze die Pfeiltasten links und rechts oder A und D, um dich zu bewegen",
+    "- Drücke die Leertaste, um das Spiel zu starten oder neu zu starten",
+    "- Vermeide es, von den Plattformen zu fallen",
+    "Drücke die Leertaste, um das Spiel zu starten"
+    ],
+    "game_over": "Spiel vorbei",
+    "high_score": "Rekord"
+}
