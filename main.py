@@ -11,6 +11,7 @@ from camera import Camera
 from character import Character
 from constants import (FPS, GRAVITY, LIGHT_BLUE, PLATFORM_HEIGHT,
                        PLATFORM_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH)
+from high_score_label import HighScoreLabel
 from platform_sprite import Platform
 
 # Initialize Pygame
@@ -109,24 +110,32 @@ def start_screen(strings: dict) -> None:
 
 
 class HighScoreLabel(pygame.sprite.Sprite):
-    def __init__(self, x: int, y: int, font: pygame.font.Font, color: Tuple[int, int, int], high_score_text: str):
+    def __init__(self, x: int, y: int, font: pygame.font.Font, color: Tuple[int, int, int], score_text: str, high_score_text: str):
         super().__init__()
         self.font: pygame.font.Font = font
         self.color: Tuple[int, int, int] = color
         self.score: int = 0
+        self.high_score: int = 0
+        self.score_text: str = score_text
         self.high_score_text: str = high_score_text
         self.x: int = x
         self.y: int = y
         self.update_text()
 
     def update_text(self) -> None:
-        self.image: pygame.Surface = self.font.render(f"{self.high_score_text}: {self.score}", True, self.color)
+        score_text: pygame.Surface = self.font.render(f"{self.score_text}: {self.score}", True, self.color)
+        high_score_text: pygame.Surface = self.font.render(f"{self.high_score_text}: {self.high_score}", True, self.color)
+        self.image: pygame.Surface = pygame.Surface((max(score_text.get_width(), high_score_text.get_width()), score_text.get_height() + high_score_text.get_height()))
+        self.image.fill(LIGHT_BLUE)
+        self.image.blit(score_text, (0, 0))
+        self.image.blit(high_score_text, (0, score_text.get_height()))
         self.rect: pygame.Rect = self.image.get_rect(topleft=(self.x, self.y))
 
-    def update_score(self, score: int) -> None:
+    def update_score(self, score: int, high_score: int) -> None:
         self.score = score
+        self.high_score = high_score
         self.update_text()
-        logging.info(f"New high score: {high_score}")
+        logging.info(f"Current score: {score}, High score: {high_score}")
 
 
 def game(strings: dict, high_score: int) -> int:
@@ -146,8 +155,8 @@ def game(strings: dict, high_score: int) -> int:
 
     # Create overlay elements
     font: pygame.font.Font = pygame.font.Font(None, 36)
-    high_score_label: HighScoreLabel = HighScoreLabel(10, 10, font, (0, 0, 0), strings.get('high_score', 'High Score'))
-    overlay_elements: pygame.sprite.Group = pygame.sprite.Group(high_score_label)
+    score_label: HighScoreLabel = HighScoreLabel(10, 10, font, (0, 0, 0), strings.get('score', 'Score'), strings.get('high_score', 'High Score'))
+    overlay_elements: pygame.sprite.Group = pygame.sprite.Group(score_label)
 
     # Generate initial platforms
     while len(platforms) < 6:  # Adjust the number of initial platforms as needed
@@ -180,11 +189,11 @@ def game(strings: dict, high_score: int) -> int:
             if last_platform_jumped.rect.top < highest_platform.rect.top and not last_platform_jumped.passed:
                 passed_platforms += 1
                 last_platform_jumped.passed = True
-                logging.info("You have passed a platform")
+                logging.info("You have passed a platform.")
                 score = passed_platforms
                 if score > high_score:
                     high_score = score
-                    high_score_label.update_score(high_score)
+                score_label.update_score(score, high_score)
 
         # Gravity
         player_y_change += GRAVITY

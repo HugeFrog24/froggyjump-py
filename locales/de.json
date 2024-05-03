@@ -8,5 +8,6 @@
     "Drücke die Leertaste, um das Spiel zu starten"
     ],
     "game_over": "Spiel vorbei",
+    "score": "Punkte",
     "high_score": "Rekord"
 }

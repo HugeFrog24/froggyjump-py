@@ -8,5 +8,6 @@
         "Press the spacebar to start the game"
     ],
     "game_over": "Game Over",
+    "score": "Score",
     "high_score": "High Score"
 }
