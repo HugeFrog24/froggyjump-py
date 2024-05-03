@@ -9,5 +9,6 @@
     "start_prompt": "Drücke die Leertaste, um das Spiel zu starten",
     "game_over": "Spiel vorbei", 
     "score": "Punkte",
-    "high_score": "Rekord"
+    "high_score": "Rekord",
+    "project_note": "Dieses Projekt wurde 2024 von Sergej im Rahmen eines Praktikums beim NerdsClub IT Service entwickelt."
 }

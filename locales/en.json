@@ -9,5 +9,6 @@
     "game_over": "Game Over",
     "start_prompt": "Press the spacebar to start the game",
     "score": "Score",
-    "high_score": "High Score"
+    "high_score": "High Score",
+    "project_note": "This project was developed in 2024 by Sergej during an internship at NerdsClub IT Service Chemnitz."
 }
