@@ -1,3 +1,4 @@
+import logging
 import pygame
 from typing import Tuple
 from constants import LIGHT_BLUE
@@ -28,3 +29,4 @@ class HighScoreLabel(pygame.sprite.Sprite):
         self.score = score
         self.high_score = high_score
         self.update_text()
+        logging.info(f"Current score: {score}, High score: {high_score}.")
