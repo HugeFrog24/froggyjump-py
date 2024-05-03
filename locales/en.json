@@ -2,12 +2,12 @@
     "title": "Frog Jump Game",
     "instructions": [
         "Instructions:",
-        "- Use the left and right arrow keys or A and D to move",
-        "- Press the spacebar to start or restart the game",
-        "- Avoid falling off the platforms",
-        "Press the spacebar to start the game"
+        "- Use the left and right arrow keys or A and D to move.",
+        "- Press the spacebar to start or restart the game.",
+        "- Avoid falling off the platforms."
     ],
     "game_over": "Game Over",
+    "start_prompt": "Press the spacebar to start the game",
     "score": "Score",
     "high_score": "High Score"
 }

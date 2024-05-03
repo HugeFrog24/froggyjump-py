@@ -15,5 +15,9 @@ FPS: int = 60
 GRAVITY: float = 0.5
 JUMP_HEIGHT: int = 10
 
-PLATFORM_WIDTH: int = 90
+PLATFORM_WIDTH: int = 80
 PLATFORM_HEIGHT: int = 20
+
+# Platform distances
+MIN_PLATFORM_DISTANCE: int = 130
+MAX_PLATFORM_DISTANCE: int = 220

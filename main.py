@@ -9,7 +9,7 @@ import pygame
 
 from camera import Camera
 from character import Character
-from constants import (FPS, GRAVITY, LIGHT_BLUE, PLATFORM_HEIGHT,
+from constants import (FPS, GRAVITY, LIGHT_BLUE, MAX_PLATFORM_DISTANCE, MIN_PLATFORM_DISTANCE, PLATFORM_HEIGHT,
                        PLATFORM_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH)
 from high_score_label import HighScoreLabel
 from platform_sprite import Platform
@@ -55,9 +55,9 @@ def add_platform() -> None:
     # Randomly add a new platform
     p_x: int = random.randint(0, SCREEN_WIDTH - PLATFORM_WIDTH)
 
-    # Calculate the vertical distance between platforms based on a fixed value
+    # Calculate the vertical distance between platforms based on the constants
     last_platform_y: int = platforms[-1].rect.y
-    vertical_distance: int = random.randint(150, 200)
+    vertical_distance: int = random.randint(MIN_PLATFORM_DISTANCE, MAX_PLATFORM_DISTANCE)
     p_y: int = last_platform_y - vertical_distance
 
     platform: Platform = Platform(p_x, p_y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
@@ -75,35 +75,71 @@ def game_over_screen(strings: dict) -> None:
 
 
 def start_screen(strings: dict) -> None:
-    font: pygame.font.Font = pygame.font.Font(None, 36)
-    title_text: pygame.Surface = font.render(strings.get("title", "Frog Jump Game"), True, (0, 0, 0))
+    title_font: pygame.font.Font = pygame.font.Font(None, 48)
+    title_text: pygame.Surface = title_font.render(strings.get("title", "Frog Jump Game"), True, (0, 0, 0))
     title_rect: pygame.Rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 4))
 
+    instructions_font: pygame.font.Font = pygame.font.Font(None, 24)
     instructions_text: List[str] = strings.get("instructions", [])
     instructions_rects: List[pygame.Rect] = []
-    for i, text in enumerate(instructions_text):
-        instruction: pygame.Surface = font.render(text, True, (0, 0, 0))
-        instruction_rect: pygame.Rect = instruction.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + i * 40))
+
+    # Calculate the available vertical space for instructions
+    available_space = SCREEN_HEIGHT // 2 - title_rect.bottom - 40  # Subtract additional space for high score label
+    line_spacing = 10  # Adjust the line spacing as needed
+
+    # Wrap instructions onto multiple lines if necessary
+    wrapped_instructions = []
+    for instruction in instructions_text:
+        words = instruction.split(' ')
+        line = ''
+        for word in words:
+            test_line = line + word + ' '
+            test_width = instructions_font.size(test_line)[0]
+            if test_width > SCREEN_WIDTH - 40:
+                wrapped_instructions.append(line)
+                line = word + ' '
+            else:
+                line = test_line
+        wrapped_instructions.append(line)
+
+    # Display all the wrapped instructions
+    displayed_instructions = wrapped_instructions
+
+    # Calculate the vertical position of instructions
+    instructions_y = title_rect.bottom + 20  # Adjust the spacing as needed
+    for instruction in displayed_instructions:
+        instruction_surface = instructions_font.render(instruction, True, (0, 0, 0))
+        instruction_rect = instruction_surface.get_rect(center=(SCREEN_WIDTH // 2, instructions_y))
         instructions_rects.append(instruction_rect)
+        instructions_y += instructions_font.get_height() + line_spacing
 
-    high_score_text: pygame.Surface = font.render(f"{strings.get('high_score', 'High Score')}: {high_score}", True, (0, 0, 0))
-    high_score_rect: pygame.Rect = high_score_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + len(instructions_text) * 40 + 40))
+    start_prompt = instructions_font.render(strings.get("start_prompt", "Press the spacebar to start the game"), True, (0, 0, 0))
+    start_prompt_rect = start_prompt.get_rect(center=(SCREEN_WIDTH // 2, instructions_y + 40))  
 
-    while True:
+    high_score_font: pygame.font.Font = pygame.font.Font(None, 36)
+    high_score_text: pygame.Surface = high_score_font.render(f"{strings.get('high_score', 'High Score')}: {high_score}", True, (0, 0, 0))
+    high_score_rect: pygame.Rect = high_score_text.get_rect(center=(SCREEN_WIDTH // 2, instructions_y + 80))  # Adjust the spacing as needed
+
+    pygame.event.clear()  # Clear the event queue before entering the loop
+
+    waiting_for_spacebar = True
+    while waiting_for_spacebar:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    game(strings, high_score)  # Pass high_score to the game function
-                    return
+                    logging.info("Spacebar pressed. Starting new game session.")
+                    waiting_for_spacebar = False
+                    break
 
         screen.fill(LIGHT_BLUE)
         screen.blit(title_text, title_rect)
-        for instruction, instruction_rect in zip(instructions_text, instructions_rects):
-            screen.blit(font.render(instruction, True, (0, 0, 0)), instruction_rect)
-        high_score_text = font.render(f"{strings.get('high_score', 'High Score')}: {high_score}", True, (0, 0, 0))  # Update high score text
+        for instruction, instruction_rect in zip(displayed_instructions, instructions_rects):
+            screen.blit(instructions_font.render(instruction, True, (0, 0, 0)), instruction_rect)
+        screen.blit(start_prompt, start_prompt_rect)
+        high_score_text = high_score_font.render(f"{strings.get('high_score', 'High Score')}: {high_score}", True, (0, 0, 0))  # Update high score text
         screen.blit(high_score_text, high_score_rect)
 
         pygame.display.update()
@@ -116,6 +152,8 @@ def game(strings: dict, high_score: int) -> int:
     score: int = 0
     passed_platforms: int = 0
     last_platform_jumped: Optional[Platform] = None  # Initialize last_platform_jumped to None
+
+    logging.info("Game session started.")
 
     # Reset game state
     player: Character = Character(80, [SCREEN_WIDTH // 2, SCREEN_HEIGHT - 80], 'frog.png')
