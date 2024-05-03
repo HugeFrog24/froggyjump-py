@@ -71,6 +71,7 @@ def game_over_screen(strings: dict) -> None:
     screen.blit(text, text_rect)
     pygame.display.update()
     pygame.time.wait(2000)  # Wait for 2 seconds
+    pygame.event.clear()  # Clear the event queue
 
 
 def start_screen(strings: dict) -> None:
@@ -166,6 +167,12 @@ def game(strings: dict, high_score: int) -> int:
     player.rect.bottomleft = (SCREEN_WIDTH // 2, platforms[1].rect.top)
 
     while running:
+        # Game over condition
+        if player.rect.top > camera.offset_y + SCREEN_HEIGHT:
+            logging.info("Game over")
+            game_over_screen(strings)
+            return high_score  # Return the updated high score when the game is over
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -233,12 +240,6 @@ def game(strings: dict, high_score: int) -> int:
 
         # Draw overlay elements
         overlay_elements.draw(screen)
-
-        # Game over condition
-        if player.rect.top > camera.offset_y + SCREEN_HEIGHT:
-            logging.info("Game over")
-            game_over_screen(strings)
-            return high_score  # Return the updated high score when the game is over
 
         pygame.display.update()
         clock.tick(FPS)
