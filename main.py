@@ -94,6 +94,7 @@ def start_screen(strings: dict) -> None:
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
+                    game(strings, high_score)  # Pass high_score to the game function
                     return
 
         screen.fill(LIGHT_BLUE)
@@ -128,8 +129,8 @@ class HighScoreLabel(pygame.sprite.Sprite):
         logging.info(f"New high score: {high_score}")
 
 
-def game(strings: dict) -> None:
-    global platforms, high_score
+def game(strings: dict, high_score: int) -> int:
+    global platforms
     running: bool = True
     score: int = 0
     passed_platforms: int = 0
@@ -228,7 +229,7 @@ def game(strings: dict) -> None:
         if player.rect.top > camera.offset_y + SCREEN_HEIGHT:
             logging.info("Game over")
             game_over_screen(strings)
-            return  # Return to the start screen
+            return high_score  # Return the updated high score when the game is over
 
         pygame.display.update()
         clock.tick(FPS)
@@ -243,4 +244,4 @@ if __name__ == "__main__":
     strings: dict = load_localized_strings(language)
     while True:
         start_screen(strings)
-        game(strings)
+        high_score = game(strings, high_score)  # Store the updated high score
