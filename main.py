@@ -136,7 +136,7 @@ class HighScoreLabel(pygame.sprite.Sprite):
         self.score = score
         self.high_score = high_score
         self.update_text()
-        logging.info(f"Current score: {score}, High score: {high_score}")
+        logging.info(f"Current score: {score}, High score: {high_score}.")
 
 
 def game(strings: dict, high_score: int) -> int:
@@ -181,12 +181,15 @@ def game(strings: dict, high_score: int) -> int:
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     player_x_change = -5
                     player.flip_horizontally("left")
+                    logging.info("Left key pressed.")
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     player_x_change = 5
                     player.flip_horizontally("right")
+                    logging.info("Right key pressed.")
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_a or event.key == pygame.K_d:
                     player_x_change = 0
+                    logging.info("Left/Right key released.")
 
         screen.fill(LIGHT_BLUE)  # Fill the screen with light blue color
 
