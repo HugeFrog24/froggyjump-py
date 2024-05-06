@@ -23,7 +23,7 @@ class Character(pygame.sprite.Sprite):
         self.rect.move_ip(x_change, y_change)
         self.altitude -= y_change  # Update altitude, decrease when descending, increase when ascending
 
-        logging.debug(self.altitude)
+        logging.debug(f"Absolute Y changed: {self.altitude}")
 
         # Update last platform only when the player is on a platform
         self.last_platform = None

@@ -393,7 +393,16 @@ if __name__ == "__main__":
     parser.add_argument(
         "-l", "--language", default="en", help="Language code (default: en)"
     )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Increase logging level to DEBUG"
+    )
     args: argparse.Namespace = parser.parse_args()
+
+    # Set logging level based on the verbose flag
+    if args.verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
+    else:
+        logging.getLogger().setLevel(logging.INFO)
 
     language: str = args.language
     strings: dict = load_localized_strings(language)
