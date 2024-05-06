@@ -1,3 +1,4 @@
+import logging
 from typing import List, Optional
 
 import pygame
@@ -13,17 +14,23 @@ class Character(pygame.sprite.Sprite):
         self.image: pygame.Surface = self.original_image
         self.rect: pygame.Rect = self.image.get_rect(topleft=pos)
         self.facing_right: bool = False
-        self.last_platform: Optional[Platform] = None  # Track the last platform jumped from
+        self.last_platform: Optional[Platform] = (
+            None  # Track the last platform jumped from
+        )
+        self.altitude: int = pos[1]  # Initialize altitude based on initial Y position
 
     def update(self, x_change: int, y_change: int, platforms: List[Platform]) -> None:
-       self.rect.move_ip(x_change, y_change)
+        self.rect.move_ip(x_change, y_change)
+        self.altitude -= y_change  # Update altitude, decrease when descending, increase when ascending
 
-       # Update last platform only when the player is on a platform
-       self.last_platform = None
-       for platform in platforms:
-           if self.rect.colliderect(platform.rect) and y_change >= 0:
-               self.last_platform = platform
-               break
+        logging.debug(self.altitude)
+
+        # Update last platform only when the player is on a platform
+        self.last_platform = None
+        for platform in platforms:
+            if self.rect.colliderect(platform.rect) and y_change >= 0:
+                self.last_platform = platform
+                break
 
     def draw(self, surface: pygame.Surface) -> None:
         surface.blit(self.image, self.rect)
