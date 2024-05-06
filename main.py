@@ -44,12 +44,28 @@ logging.basicConfig(
 
 
 def load_localized_strings(language: str) -> dict:
+    # Load the default English strings first
+    try:
+        with open("locales/en.json", encoding="utf-8") as file:
+            strings = json.load(file)
+    except FileNotFoundError:
+        logging.error("Default English localization file not found.")
+        strings = {}  # Fallback to an empty dictionary if even the English file is missing
+
+    # If the requested language is English, return immediately
+    if language == "en":
+        return strings
+
+    # Try to load the requested language strings and update the dictionary
     try:
         with open(f"locales/{language}.json", encoding="utf-8") as file:
-            return json.load(file)
+            localized_strings = json.load(file)
+            strings.update(localized_strings)  # Update with localized strings
     except FileNotFoundError:
         logging.error(f"Localization file not found for language: {language}")
-        return {}
+        # No return here, as we fall back to English
+
+    return strings
 
 
 def draw_platforms(camera: Camera) -> None:
@@ -82,7 +98,7 @@ def add_platform() -> None:
 def game_over_screen(strings: dict) -> None:
     font: pygame.font.Font = pygame.font.Font(None, 36)
     text: pygame.Surface = font.render(
-        strings.get("game_over", "Game Over"), True, (255, 0, 0)
+        strings.get("game_over"), True, (255, 0, 0)
     )
     text_rect: pygame.Rect = text.get_rect(
         center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
@@ -112,18 +128,18 @@ def wrap_text(text: str, font: pygame.font.Font, max_width: int) -> List[str]:
 def start_screen(strings: dict) -> None:
     title_font: pygame.font.Font = pygame.font.Font(None, 48)
     title_text: pygame.Surface = title_font.render(
-        strings.get("title", "Frog Jump Game"), True, (0, 0, 0)
+        strings.get("title"), True, (0, 0, 0)
     )
     title_rect: pygame.Rect = title_text.get_rect(
         center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 4)
     )
 
     instructions_font: pygame.font.Font = pygame.font.Font(None, 24)
-    instructions_text: List[str] = strings.get("instructions", [])
+    instructions_text: List[str] = strings.get("instructions")
     instructions_rects: List[pygame.Rect] = []
 
     project_note_font: pygame.font.Font = pygame.font.Font(None, 18)
-    project_note_text: str = strings.get("project_note", "")
+    project_note_text: str = strings.get("project_note")
     project_note_lines: List[str] = wrap_text(
         project_note_text, project_note_font, SCREEN_WIDTH - 40
     )
@@ -164,7 +180,7 @@ def start_screen(strings: dict) -> None:
         instructions_y += instructions_font.get_height() + line_spacing
 
     start_prompt = instructions_font.render(
-        strings.get("start_prompt", "Press the spacebar to start the game"),
+        strings.get("start_prompt"),
         True,
         (0, 0, 0),
     )
@@ -174,7 +190,7 @@ def start_screen(strings: dict) -> None:
 
     high_score_font: pygame.font.Font = pygame.font.Font(None, 36)
     high_score_text: pygame.Surface = high_score_font.render(
-        f"{strings.get('high_score', 'High Score')}: {high_score}", True, (0, 0, 0)
+        f"{strings.get('high_score')}: {high_score}", True, (0, 0, 0)
     )
     high_score_rect: pygame.Rect = high_score_text.get_rect(
         center=(SCREEN_WIDTH // 2, instructions_y + 80)
@@ -216,7 +232,7 @@ def start_screen(strings: dict) -> None:
             )
         screen.blit(start_prompt, start_prompt_rect)
         high_score_text = high_score_font.render(
-            f"{strings.get('high_score', 'High Score')}: {high_score}", True, (0, 0, 0)
+            f"{strings.get('high_score')}: {high_score}", True, (0, 0, 0)
         )  # Update high score text
         screen.blit(high_score_text, high_score_rect)
         for line, project_note_rect in zip(project_note_lines, project_note_rects):
@@ -264,8 +280,8 @@ def game(strings: dict, high_score: int) -> int:
         10,
         font,
         (0, 0, 0),
-        strings.get("score", "Score"),
-        strings.get("high_score", "High Score"),
+        strings.get("score"),
+        strings.get("high_score"),
     )
     overlay_elements: pygame.sprite.Group = pygame.sprite.Group(score_label)
 
