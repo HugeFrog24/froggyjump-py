@@ -74,12 +74,6 @@ def draw_platforms(camera: Camera) -> None:
         screen.blit(platform.image, platform_rect)
 
 
-def jump(player: Character) -> int:
-    player.rect.y -= 1  # Move the player slightly off the platform
-    player_y_change: int = -15  # Set the initial upward velocity
-    return player_y_change
-
-
 def add_platform() -> None:
     # Randomly add a new platform
     p_x: int = random.randint(0, SCREEN_WIDTH - PLATFORM_WIDTH)
@@ -364,15 +358,10 @@ def game(strings: dict, high_score: int) -> int:
                     player.rect.bottom = (
                         platform.rect.top
                     )  # Adjust the player's position to be on top of the platform
-                    player_y_change = jump(
-                        player
-                    )  # Make the character jump automatically when they fall onto a platform
+                    player_y_change = player.jump()  # Make the character jump automatically when they fall onto a platform
 
                     # Update last_platform_jumped only when jumping on a new higher platform
-                    if (
-                        last_platform_jumped is None
-                        or platform.rect.top < last_platform_jumped.rect.top
-                    ):
+                    if last_platform_jumped is None or platform.rect.top < last_platform_jumped.rect.top:
                         last_platform_jumped = platform
 
         # Add new platforms when the player reaches a certain height relative to the camera's offset
