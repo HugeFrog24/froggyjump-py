@@ -17,9 +17,9 @@ class Character(pygame.sprite.Sprite):
         self.last_platform: Optional[Platform] = (
             None  # Track the last platform jumped from
         )
-        self.altitude: int = pos[1]  # Initialize altitude based on initial Y position
+        self.altitude: float = pos[1]  # Initialize altitude based on initial Y position
 
-    def update(self, x_change: int, y_change: int, platforms: List[Platform]) -> None:
+    def update(self, x_change: float, y_change: float, platforms: List[Platform]) -> None:
         self.rect.move_ip(x_change, y_change)
         self.altitude -= y_change  # Update altitude, decrease when descending, increase when ascending
 
@@ -35,10 +35,9 @@ class Character(pygame.sprite.Sprite):
     def draw(self, surface: pygame.Surface) -> None:
         surface.blit(self.image, self.rect)
 
-    def jump(self) -> None:
+    def jump(self) -> int:
         self.rect.y -= 1  # Move the player slightly off the platform
-        self.y_change = -15  # Set the initial upward velocity
-        return self.y_change
+        return -15  # Set the initial upward velocity
 
 
     def flip_horizontally(self, direction: str) -> None:

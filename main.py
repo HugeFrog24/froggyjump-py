@@ -253,8 +253,8 @@ def game(strings: dict, high_score: int) -> int:
     player: Character = Character(
         80, [SCREEN_WIDTH // 2, SCREEN_HEIGHT - 80], "frog.png"
     )
-    player_x_change: int = 0
-    player_y_change: int = 0
+    player_x_change: float = 0
+    player_y_change: float = 0
     platforms = [
         Platform(
             SCREEN_WIDTH // 2 - PLATFORM_WIDTH // 2,
@@ -388,6 +388,8 @@ def game(strings: dict, high_score: int) -> int:
 
         pygame.display.update()
         clock.tick(FPS)
+
+    return high_score  # Ensure high_score is returned if the loop exits
 
 
 if __name__ == "__main__":
