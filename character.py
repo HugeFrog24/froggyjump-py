@@ -39,7 +39,6 @@ class Character(pygame.sprite.Sprite):
         self.rect.y -= 1  # Move the player slightly off the platform
         return -15  # Set the initial upward velocity
 
-
     def flip_horizontally(self, direction: str) -> None:
         if direction == "right" and not self.facing_right:
             self.image = pygame.transform.flip(self.original_image, True, False)
