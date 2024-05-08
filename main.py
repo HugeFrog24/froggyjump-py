@@ -22,6 +22,7 @@ from constants import (
 )
 from high_score_label import HighScoreLabel
 from platform_sprite import Platform
+from world import World
 
 # Initialize Pygame
 pygame.init()
@@ -74,19 +75,19 @@ def draw_platforms(camera: Camera) -> None:
         screen.blit(platform.image, platform_rect)
 
 
-def add_platform() -> None:
+def add_platform(world: World) -> None:
     # Randomly add a new platform
     p_x: int = random.randint(0, SCREEN_WIDTH - PLATFORM_WIDTH)
 
     # Calculate the vertical distance between platforms based on the constants
-    last_platform_y: int = platforms[-1].absolute_y
+    last_platform_y: int = world.platforms[-1].absolute_y if world.platforms else SCREEN_HEIGHT
     vertical_distance: int = random.randint(
         MIN_PLATFORM_DISTANCE, MAX_PLATFORM_DISTANCE
     )
     p_y: int = last_platform_y - vertical_distance
 
     platform: Platform = Platform(p_x, p_y, PLATFORM_WIDTH, PLATFORM_HEIGHT, absolute_y=p_y)
-    platforms.append(platform)
+    world.add_platform(platform)
 
 
 def game_over_screen(strings: dict) -> None:
@@ -266,6 +267,7 @@ def game(strings: dict, high_score: int) -> int:
     Platform.reset_id()  # Reset platform IDs when starting a new game
 
     camera: Camera = Camera(player)  # Create a camera instance
+    world = World(SCREEN_WIDTH, SCREEN_HEIGHT)
 
     # Create overlay elements
     font: pygame.font.Font = pygame.font.Font(None, 36)
@@ -280,11 +282,11 @@ def game(strings: dict, high_score: int) -> int:
     overlay_elements: pygame.sprite.Group = pygame.sprite.Group(score_label)
 
     # Generate initial platforms
-    while len(platforms) < 6:  # Adjust the number of initial platforms as needed
-        add_platform()
+    while len(world.platforms) < 6:  # Adjust the number of initial platforms as needed
+        add_platform(world)
 
     # Set player's starting position on the second platform
-    player.rect.bottomleft = (SCREEN_WIDTH // 2, platforms[1].rect.top)
+    player.rect.bottomleft = (SCREEN_WIDTH // 2, world.platforms[1].rect.top)
 
     while running:
         # Game over condition
@@ -366,7 +368,7 @@ def game(strings: dict, high_score: int) -> int:
 
         # Add new platforms when the player reaches a certain height relative to the camera's offset
         if player.rect.top < camera.offset_y + SCREEN_HEIGHT // 3:
-            add_platform()
+            add_platform(world)
 
         # Remove platforms that are no longer visible on the screen
         platforms = [
@@ -381,7 +383,7 @@ def game(strings: dict, high_score: int) -> int:
         # Draw the player and platforms
         player_rect: pygame.Rect = camera.apply(player.rect)
         screen.blit(player.image, player_rect)
-        draw_platforms(camera)
+        world.draw_platforms(screen, camera.offset_y)
 
         # Draw overlay elements
         overlay_elements.draw(screen)
