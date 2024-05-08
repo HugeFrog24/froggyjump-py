@@ -327,7 +327,7 @@ def game(strings: dict, high_score: int) -> int:
             and player.rect.bottom <= last_platform_jumped.rect.top
         ):
             highest_platform: Platform = max(
-                platforms, key=lambda platform: platform.rect.top
+                world.platforms, key=lambda platform: platform.rect.top
             )
             if (
                 last_platform_jumped.rect.top < highest_platform.rect.top
@@ -354,7 +354,7 @@ def game(strings: dict, high_score: int) -> int:
             player.rect.right = SCREEN_WIDTH
 
         # Collision detection
-        for platform in platforms:
+        for platform in world.platforms:
             if player.rect.colliderect(platform.rect):
                 if player_y_change > 0:  # Check if the player is falling
                     player.rect.bottom = (
