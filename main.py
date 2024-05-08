@@ -282,7 +282,7 @@ def game(strings: dict, high_score: int) -> int:
     overlay_elements: pygame.sprite.Group = pygame.sprite.Group(score_label)
 
     # Generate initial platforms
-    while len(world.platforms) < 6:  # Adjust the number of initial platforms as needed
+    while len(world.get_platforms()) < 6:  # Adjust the number of initial platforms as needed
         add_platform(world)
 
     # Set player's starting position on the second platform
@@ -354,7 +354,7 @@ def game(strings: dict, high_score: int) -> int:
             player.rect.right = SCREEN_WIDTH
 
         # Collision detection
-        for platform in world.platforms:
+        for platform in world.get_platforms():
             if player.rect.colliderect(platform.rect):
                 if player_y_change > 0:  # Check if the player is falling
                     player.rect.bottom = (
